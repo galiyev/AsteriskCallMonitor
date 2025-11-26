@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Sufficit.Asterisk.Core" Version="1.25.1009.1745" />
+    <PackageReference Include="Sufficit.Asterisk.FastAGI" Version="1.25.930.2114" />
+    <PackageReference Include="Sufficit.Asterisk.Manager" Version="1.25.911.2225" />
+    <PackageReference Include="Sufficit.Asterisk.Manager.Core" Version="1.22.407.315" />
+    <PackageReference Include="Sufficit.Asterisk.Shared" Version="1.25.825.1916" />
+  </ItemGroup>
+
+</Project>
