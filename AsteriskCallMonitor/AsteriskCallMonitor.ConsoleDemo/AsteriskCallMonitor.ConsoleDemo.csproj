@@ -12,8 +12,15 @@
     <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageReference Include="Sufficit.Asterisk.Core" Version="1.25.911.2225" />
-    <PackageReference Include="Sufficit.Asterisk.Manager" Version="1.25.911.2225" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Sufficit.Asterisk.Core">
+      <HintPath>..\libs\Sufficit.Asterisk.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Sufficit.Asterisk.Manager">
+      <HintPath>..\libs\Sufficit.Asterisk.Manager.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <PropertyGroup>

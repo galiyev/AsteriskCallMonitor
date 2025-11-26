@@ -7,7 +7,34 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sufficit.Asterisk.Manager" Version="1.25.911.2225" />
+    <Reference Include="Sufficit.Asterisk.Manager">
+      <HintPath>..\libs\Sufficit.Asterisk.Manager.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Sufficit.Asterisk.Core">
+      <HintPath>..\libs\Sufficit.Asterisk.Core.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Sufficit.Asterisk.Shared">
+      <HintPath>..\libs\Sufficit.Asterisk.Shared.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Sufficit.Asterisk.Utils">
+      <HintPath>..\libs\Sufficit.Asterisk.Utils.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Sufficit.Base">
+      <HintPath>..\libs\Sufficit.Base.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Sufficit.Utils">
+      <HintPath>..\libs\Sufficit.Utils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
   </ItemGroup>
 
 </Project>
