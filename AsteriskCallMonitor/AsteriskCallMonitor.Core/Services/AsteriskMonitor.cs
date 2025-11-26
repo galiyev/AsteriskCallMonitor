@@ -34,7 +34,7 @@ public class AsteriskMonitor : IAsteriskMonitor
             _providerLogger
         );
 
-        _connection = await _provider.ConnectAsync(keepalive: true);
+        _connection = await _provider.ConnectAsync(keepalive: true, cancellationToken);
 
         _events = new ManagerEventSubscriptions();
         _connection.Use(_events, disposable: true);

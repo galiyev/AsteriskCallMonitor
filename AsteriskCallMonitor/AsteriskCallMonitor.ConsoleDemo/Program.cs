@@ -1,14 +1,23 @@
 ﻿using AsteriskCallMonitor.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using Sufficit.Asterisk.Manager;
 
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File(
+        "logs/asterisk.log",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 10)
+    .CreateLogger();
+
 var host = Host.CreateDefaultBuilder(args)
+    .UseSerilog()  // <-- подключение Serilog
     .ConfigureServices(services =>
     {
-        // Настройки AMI
         services.Configure<AMIProviderOptions>(opt =>
         {
             opt.Address = "10.10.111.5";
@@ -16,11 +25,7 @@ var host = Host.CreateDefaultBuilder(args)
             opt.Password = "123456789Aa";
             opt.KeepAlive = true;
         });
-        services.AddLogging(builder =>
-        {
-            builder.AddConsole();
-            builder.AddFile("logs/asterisk.log");  
-        });
+
         services.AddSingleton<IAsteriskMonitor, AsteriskMonitor>();
     })
     .Build();
