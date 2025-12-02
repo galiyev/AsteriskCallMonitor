@@ -1,0 +1,49 @@
+﻿version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.5
+    container_name: freepbx-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: asterisk
+      MYSQL_USER: asterisk
+      MYSQL_PASSWORD: asterisk
+    volumes:
+      - db_data:/var/lib/mysql
+
+  freepbx:
+    image: tiredofit/freepbx:latest
+    container_name: freepbx
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: asterisk
+      DB_USER: asterisk
+      DB_PASS: asterisk
+
+      ENABLE_SSL: "FALSE"
+      ENABLE_FOP: "FALSE"
+
+      # Автосоздание AMI-пользователя
+      ASTERISK_AMI_ENABLED: "TRUE"
+      ASTERISK_AMI_USER: "adminasterisk"
+      ASTERISK_AMI_SECRET: "KB+Fu4D$zF("
+      ASTERISK_AMI_PERMISSIONS: "system,call,agent,command,originate,read,write"
+
+    ports:
+      - "8080:80"        # FreePBX Web GUI
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "5038:5038"      # AMI port
+
+    volumes:
+      - freepbx_data:/data
+      - asterisk_data:/var/lib/asterisk
+
+volumes:
+  db_data:
+  freepbx_data:
+  asterisk_data:

@@ -14,17 +14,31 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var host = Host.CreateDefaultBuilder(args)
-    .UseSerilog()  // <-- подключение Serilog
+    .UseSerilog()
     .ConfigureServices(services =>
     {
-        services.Configure<AMIProviderOptions>(opt =>
+        // Именованный профиль "test"
+        // services.Configure<AMIProviderOptions>("test", opt =>
+        // {
+        //     opt.Address = "10.10.111.8";
+        //     opt.Port = 5038;
+        //     opt.Username = "adminasterisk";
+        //     opt.Password = "KB+Fu4D$zF(";
+        //     opt.KeepAlive = true;
+        // });
+        
+        services.Configure<AMIProviderOptions>("test", opt =>
         {
-            opt.Address = "10.10.111.5";
-            opt.Username = "112";
-            opt.Password = "123456789Aa";
+            opt.Address = "127.0.0.1";   // Docker → хостовая машина
+            opt.Port = 5038;             // Проброшенный AMI порт
+            opt.Username = "ami";        // Имя пользователя из FreePBX
+            opt.Password = "ami123";     // Пароль из FreePBX
             opt.KeepAlive = true;
         });
 
+        
+        
+        // Основной сервис мониторинга
         services.AddSingleton<IAsteriskMonitor, AsteriskMonitor>();
     })
     .Build();

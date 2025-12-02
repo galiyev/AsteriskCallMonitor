@@ -29,21 +29,31 @@ public class AsteriskMonitor : IAsteriskMonitor
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Connecting to Asterisk AMI...");
+        try
+        {
+            _logger.LogInformation("Connecting to Asterisk AMI...");
 
-        _provider = new AsteriskManagerProvider(
-            Options.Create(_options),
-            _providerLogger
-        );
+            _provider = new AsteriskManagerProvider(
+                Options.Create(_options),
+                _providerLogger
+            );
 
-        _connection = await _provider.ConnectAsync(keepalive: true, cancellationToken);
+            _connection = await _provider.ConnectAsync(keepalive: true, cancellationToken);
 
-        _events = new ManagerEventSubscriptions();
-        _connection.Use(_events, disposable: true);
+            _events = new ManagerEventSubscriptions();
+            _connection.Use(_events, disposable: true);
 
-        _events.On<NewChannelEvent>(OnNewChannel);
+            _events.On<NewChannelEvent>(OnNewChannel);
 
-        _logger.LogInformation("Asterisk monitor started.");
+            _logger.LogInformation("Asterisk monitor started.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation("Connecting to Asterisk AMI... {e.Message}");
+            Console.WriteLine(e);
+            throw;
+        }
+       
     }
 
     private void OnNewChannel(object? sender, NewChannelEvent evt)
