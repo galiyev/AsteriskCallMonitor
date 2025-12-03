@@ -1,49 +1,88 @@
 ﻿version: '3.8'
 
 services:
-  db:
-    image: mariadb:10.5
-    container_name: freepbx-db
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: asterisk
-      MYSQL_USER: asterisk
-      MYSQL_PASSWORD: asterisk
-    volumes:
-      - db_data:/var/lib/mysql
-
   freepbx:
-    image: tiredofit/freepbx:latest
     container_name: freepbx
-    depends_on:
-      - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: asterisk
-      DB_USER: asterisk
-      DB_PASS: asterisk
-
-      ENABLE_SSL: "FALSE"
-      ENABLE_FOP: "FALSE"
-
-      # Автосоздание AMI-пользователя
-      ASTERISK_AMI_ENABLED: "TRUE"
-      ASTERISK_AMI_USER: "adminasterisk"
-      ASTERISK_AMI_SECRET: "KB+Fu4D$zF("
-      ASTERISK_AMI_PERMISSIONS: "system,call,agent,command,originate,read,write"
-
+    image: tiredofit/freepbx:latest
     ports:
-      - "8080:80"        # FreePBX Web GUI
+      # HTTP/HTTPS для веб-интерфейса FreePBX
+      - "80:80"
+      - "443:443"
+      # SIP порты (для регистрации SIP устройств)
       - "5060:5060/udp"
       - "5060:5060/tcp"
-      - "5038:5038"      # AMI port
-
+      # RTP порты (для голосового трафика)
+      - "10000-10200:10000-10200/udp"
+      # AMI (Asterisk Manager Interface) - для .NET приложений
+      - "5038:5038"
+      # WebRTC/WSS
+      - "8088:8088"
+      - "8089:8089"
+    environment:
+      # Основные настройки
+      - VIRTUAL_HOST=freepbx.local
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=freepbx.local
+      - LETSENCRYPT_EMAIL=admin@freepbx.local
+      
+      # Настройки базы данных
+      - DB_EMBEDDED=TRUE
+      - DB_HOST=freepbx-db
+      - DB_PORT=3306
+      - DB_NAME=asterisk
+      - DB_USER=asterisk
+      - DB_PASS=asteriskpass
+      
+      # Административный пользователь FreePBX
+      - RTP_START=10000
+      - RTP_FINISH=10200
+      
+      # Включить AMI (Asterisk Manager Interface)
+      - ENABLE_FAIL2BAN=FALSE
+      - ENABLE_FOP=TRUE
+      
+      # Timezone
+      - TZ=Asia/Almaty
     volumes:
-      - freepbx_data:/data
-      - asterisk_data:/var/lib/asterisk
+      - freepbx-data:/data
+      - freepbx-logs:/var/log
+      - freepbx-recordings:/var/spool/asterisk/monitor
+      - ./asterisk-custom:/assets/custom
+    networks:
+      - freepbx-network
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+
+  freepbx-db:
+    container_name: freepbx-db
+    image: mariadb:10.6
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=asterisk
+      - MYSQL_USER=asterisk
+      - MYSQL_PASSWORD=asteriskpass
+      - TZ=Asia/Almaty
+    volumes:
+      - freepbx-db-data:/var/lib/mysql
+    networks:
+      - freepbx-network
+    restart: unless-stopped
 
 volumes:
-  db_data:
-  freepbx_data:
-  asterisk_data:
+  freepbx-data:
+    driver: local
+  freepbx-logs:
+    driver: local
+  freepbx-recordings:
+    driver: local
+  freepbx-db-data:
+    driver: local
+
+networks:
+  freepbx-network:
+    driver: bridge
